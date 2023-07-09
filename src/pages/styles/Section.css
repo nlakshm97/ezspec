@@ -1,5 +1,64 @@
-.wrapper{
-    height: '100%';
-    width: '100%';
+html{
+    height: 100%;
+    width: 100%;
+}
+
+#root{
+    height: 100%;
+    width: 100%;
+}
+body{
+    height: 100%;
+    width: 100%;
+}
+
+.container{
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     background-color: aqua;
+    
+}
+
+.section{
+    height: 90%;
+    width: 70%;
+    background-color: beige;
+    
+}
+
+.details{
+    height: 100%;
+    width: 30%;
+ 
+    float: left;
+
+}
+
+.document{
+    height: 100%;
+    width: 70%;
+
+    float: right;
+}
+
+.page{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#contentId{
+    overflow: auto;
+    width: 95%;
+    height: 95%;
+    resize: none;
+    border: none;
+    background-color: white;
 }
