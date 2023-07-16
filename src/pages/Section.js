@@ -72,14 +72,20 @@ const Section = () =>{
         }
         else{
         console.log(element, index, pos);
-            range.setStart(element,pos-1-index);
+            if(index == pos){
+                range.setStart(element.childNodes[0],1);
+                
+            }
+            else{
+                range.setStart(element.childNodes[0],pos-1-index);
+            }
         }
          
         
         range.collapse(true);
         sel.removeAllRanges();
         sel.addRange(range);
-        el.focus();
+   
      
         console.log("focus called");
     }
@@ -164,6 +170,14 @@ function handlePaste(e) {
         }
         let targetId = event.target.id;
         console.log(targetId);
+        console.log("children length",document.getElementById("contentId").children.length )
+        if(document.getElementById("contentId").children.length == 1){
+            console.log(document.getElementById("contentId").children[0].nodeName);
+            if(document.getElementById("contentId").children[0].nodeName ==  "BR"){
+                document.getElementById("contentId").innerHTML = "";
+                return;
+            }
+        }
         let caretPosition = getCaretPosition(document.getElementById(targetId));
         console.log(caretPosition);
 

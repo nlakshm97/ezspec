@@ -59,26 +59,53 @@ export default class LCS{
     
         let text = "";
         console.log("-->",originalText, commonText);
+        let stk = [];
+        let txt = [];
+
         while (i < commonText.length && j < originalText.length) {
           if (commonText[i] == originalText[j]) {
             
             text += "<span>"+ commonText[i] +"</span>";
+            stk.push("span");
+            txt.push(commonText[i]);
             i++;
             j++;
           } 
           else {
             text += "<mark>"+originalText[j]+"</mark>";
+            stk.push("mark");
+            txt.push(originalText[j]);
             j++;
           }
         }
 
         while (j < originalText.length) {
- 
+            stk.push("mark");
+            txt.push(originalText[j]);
             text += "<mark>"+originalText[j]+"</mark>";
             j++;
         }
-        console.log(text);
-        contentElementId.innerHTML = text;
+        let textOpt = "";
+        let current = "";
+
+        if(stk.length > 0){
+          
+                 current = "<"+stk[0]+">"+txt[0]+"</"+stk[0]+">"   
+            
+          
+        }
+        for(let i =1;i<stk.length;i++){
+            if (stk[i-1] == stk[i]){
+                    current = current.replace("</"+stk[i]+">", "");
+                    current += txt[i] + "</"+stk[i]+">";
+            }
+            else{
+                textOpt += current;
+                current = "<"+stk[i]+">"+txt[i]+"</"+stk[i]+">" ;
+            }
+        }
+        textOpt += current;
+        contentElementId.innerHTML = textOpt;
       };
 
 
