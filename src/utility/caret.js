@@ -24,6 +24,47 @@ export default class Caret{
         return cursorIndex;
       }
 
+      getCaretPositionDuringPaste(editableDiv, element){
+        let children = editableDiv.children;
+        let cursorIndex = 0;
+
+        let isInnerLoopBreak = false;
+
+        for(let i=0;i<children.length;i++){
+            let child = children[i];
+            if(child.children.length == 0){
+                cursorIndex += child.innerText.length;
+            }
+
+            console.log(children[i]);
+            if(child == element){
+                break;
+            }
+            
+            if(child.children.length == 0){
+                continue;
+            }
+            let childNodes = child.childNodes;
+            for(let j=0;j<childNodes.length;j++){
+                if(childNodes[j].nodeName == "#text"){
+                    cursorIndex += childNodes[j].length;
+                }
+                else{
+                    cursorIndex += childNodes[j].innerText.length;
+                }
+                if(childNodes[j] == element){
+                    isInnerLoopBreak = true;
+                    break;
+                }
+            }
+
+            if(isInnerLoopBreak){
+                break;
+            }
+
+        }
+        return cursorIndex;
+      }
 
       setCaret(editableDiv, pos) {
         

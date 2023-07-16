@@ -64,15 +64,13 @@ export default class LCS{
 
         while (i < commonText.length && j < originalText.length) {
           if (commonText[i] == originalText[j]) {
-            
-            text += "<span>"+ commonText[i] +"</span>";
             stk.push("span");
             txt.push(commonText[i]);
             i++;
             j++;
           } 
           else {
-            text += "<mark>"+originalText[j]+"</mark>";
+         
             stk.push("mark");
             txt.push(originalText[j]);
             j++;
@@ -82,17 +80,16 @@ export default class LCS{
         while (j < originalText.length) {
             stk.push("mark");
             txt.push(originalText[j]);
-            text += "<mark>"+originalText[j]+"</mark>";
+  
             j++;
         }
         let textOpt = "";
         let current = "";
 
         if(stk.length > 0){
-                
-                 current = "<"+stk[0]+">"+txt[0]+"</"+stk[0]+">"   
+
+            current = "<"+stk[0]+">"+txt[0]+"</"+stk[0]+">"   
             
-          
         }
         for(let i =1;i<stk.length;i++){
             if (stk[i-1] == stk[i]){

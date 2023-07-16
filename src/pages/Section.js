@@ -13,10 +13,7 @@ const Section = () =>{
     useEffect(() => {
         let textArea = document.getElementById("contentId");
         textArea.addEventListener('input', handleChange);
-        textArea.addEventListener("paste",function(event){
-           console.log(event);
-            setTimeout( handlePaste);
-        }, true);
+        textArea.addEventListener("paste",handlePaste);
         actualText = textArea.innerText;
       }, []);
 
@@ -24,70 +21,32 @@ const Section = () =>{
 
 
 
-var pasteCursorIndex = 0;
-function handlePaste(e) {
-  
-    let element = document.getElementById("contentId");
-    let children = element.childNodes;
+
+function handlePaste(event) {
+    console.log("handle paste called ....");
+
+
+
+    event.preventDefault();
+
+    let editableDiv = event.currentTarget;
+    let paste = (event.clipboardData || window.clipboardData).getData("text");
+    const selection = window.getSelection();
+    console.log(selection);
+    if (!selection.rangeCount) return;
+    selection.deleteFromDocument();
+
     let spanElement = document.createElement("span");
-    let text = "";
-    let others = [];
-    
-    for(let i=0;i<children.length;i++){
-        console.log(children[i].nodeName);
-        if (children[i].nodeName == "#text"){
-            others.push("#text");
-            text += (children[i].nodeValue);
-        }
-        else{
-            others.push(children[i]);
-        }
+    spanElement.appendChild(document.createTextNode(paste));
+    selection.getRangeAt(0).insertNode(spanElement);
+    selection.collapseToEnd();
 
-    }
-    if(text.length > 0){
-        pasteCursorIndex = 0;
-    }
 
-    spanElement.innerHTML = text;
-    element.innerHTML = "";
-    console.log(children);
-    let isSpanInserted = false;
-    for(let i=0;i<others.length;i++){
-        if (others[i] != "#text"){
-            element.appendChild(others[i]);
-            if(!isSpanInserted){
-                if(text.length > 0){
-                    pasteCursorIndex  += others[i].innerText.length;
-                }
-            }
-        }
-        else{
-            if(!isSpanInserted){
-                isSpanInserted= true;
-                element.appendChild(spanElement);
-            }
-        }
-    }
-    
-    if(text.length > 0){
-        pasteCursorIndex  += text.length;
-        console.log(pasteCursorIndex);
-        let currentText = document.getElementById("contentId").innerText;
-        console.log("before", currentText);
-        currentText = currentText.replaceAll("<mark>", "");
-        currentText = currentText.replaceAll("</mark>", "");
-        console.log(currentText);
-
-        console.log(actualText, currentText);
-        let mat = lcs.findLCS(actualText, currentText);
-        let commonText = lcs.findCommonText(actualText, currentText, mat);
-        lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
-        caret.setCaret(element, pasteCursorIndex);
-    }
-    else{
-        console.log(pasteCursorIndex, "secodn time");
-        caret.setCaret(element, pasteCursorIndex);
-    }
+    let caretPosition = caret.getCaretPositionDuringPaste(editableDiv, spanElement);
+    console.log(caretPosition);
+    highlightText(editableDiv);
+    caret.setCaret(editableDiv, caretPosition);
+  
     
 }
 
@@ -98,10 +57,20 @@ function handlePaste(e) {
             let child = children[i];
             text += child.innerText;
         }
+        console.log(text);
         return text;
     }
+
     const isEditableDivEmpty = (editableDiv) => {
         return false;
+    }
+
+    const highlightText = (editableDiv) => {
+        let currentText = getCurrentText(editableDiv);
+        console.log("current text ...", currentText);
+        let mat = lcs.findLCS(actualText, currentText);
+        let commonText = lcs.findCommonText(actualText, currentText, mat);
+        lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
     }
 
     const handleChange = (event) =>{
@@ -119,13 +88,7 @@ function handlePaste(e) {
 
         let caretPosition = caret.getCaretPosition(editableDiv);
         console.log(caretPosition);
-
-        let currentText = getCurrentText(editableDiv);
-        console.log("current text ...", currentText);
-        let mat = lcs.findLCS(actualText, currentText);
-        let commonText = lcs.findCommonText(actualText, currentText, mat);
-        lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
-
+        highlightText(editableDiv);
         caret.setCaret(editableDiv, caretPosition);
 
     }
