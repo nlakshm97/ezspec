@@ -89,7 +89,7 @@ export default class LCS{
         let current = "";
 
         if(stk.length > 0){
-          
+                
                  current = "<"+stk[0]+">"+txt[0]+"</"+stk[0]+">"   
             
           

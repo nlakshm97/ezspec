@@ -1,12 +1,14 @@
 import './styles/Section.css';
 import React, {  useEffect } from 'react';
 import LCS from '../utility/lcs';
+import Caret from '../utility/caret';
 
 const Section = () =>{
 
 
     var  actualText= "";
     let lcs = new LCS();
+    let caret = new Caret();
 
     useEffect(() => {
         let textArea = document.getElementById("contentId");
@@ -18,77 +20,7 @@ const Section = () =>{
         actualText = textArea.innerText;
       }, []);
 
-      function getCaretPosition(editableDiv) {
-        var caretPos = 0,
-          sel, range;
-        
-        let children = document.getElementById("contentId").children;
-        console.log(children);
-
-        let cursorIndex = 0;
-        if (window.getSelection) {
-          sel = window.getSelection();
-          if (sel.rangeCount) {
-            range = sel.getRangeAt(0);
-            console.log(range);
-            let edit = (range.commonAncestorContainer.parentNode);
-            console.log(edit);
-            for(let i= 0; i<children.length; i++){
-                
-                if(children[i] == edit){
-                    console.log(edit, range.endOffset);
-                    cursorIndex += range.endOffset + 1;
-                    break;
-                }
-                cursorIndex += children[i].innerText.length;
-            }
-            
-          }
-        } 
-        return cursorIndex;
-      }
-
-
-      function setCaret(pos) {
-        var el = document.getElementById("contentId");
-        var range = document.createRange();
-        var sel = window.getSelection();
-
-        let children = el.children;
-        let index = 0;
-        let element= null;
-        for(let i= 0; i<children.length; i++){
-            let len = children[i].innerText.length;
-            if (index + len >= pos){
-                element = children[i];
-                break;
-            }
-            index += len;
-        }
-
-        if (element == null){
-            element= children[children.length - 1];
-            range.setStart(element,1);
-        }
-        else{
-        console.log(element, index, pos);
-            if(index == pos){
-                range.setStart(element.childNodes[0],1);
-                
-            }
-            else{
-                range.setStart(element.childNodes[0],pos-1-index);
-            }
-        }
-         
-        
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);
-   
-     
-        console.log("focus called");
-    }
+  
 
 
 
@@ -113,7 +45,7 @@ function handlePaste(e) {
 
     }
     if(text.length > 0){
-        pasteCursorIndex = 1;
+        pasteCursorIndex = 0;
     }
 
     spanElement.innerHTML = text;
@@ -150,49 +82,51 @@ function handlePaste(e) {
         let mat = lcs.findLCS(actualText, currentText);
         let commonText = lcs.findCommonText(actualText, currentText, mat);
         lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
-        setCaret(pasteCursorIndex);
+        caret.setCaret(element, pasteCursorIndex);
     }
     else{
         console.log(pasteCursorIndex, "secodn time");
-        setCaret(pasteCursorIndex);
+        caret.setCaret(element, pasteCursorIndex);
     }
     
 }
 
-
-
+    const getCurrentText = (editableDiv) => {
+        let text = "";
+        let children = editableDiv.children;
+        for (let i=0; i<children.length; i++){
+            let child = children[i];
+            text += child.innerText;
+        }
+        return text;
+    }
+    const isEditableDivEmpty = (editableDiv) => {
+        return false;
+    }
 
     const handleChange = (event) =>{
         console.log("handle change called ...");
-        console.log(event);
+
         if (event.inputType == "insertFromPaste"){
             return;
         }
         let targetId = event.target.id;
-        console.log(targetId);
-        console.log("children length",document.getElementById("contentId").children.length )
-        if(document.getElementById("contentId").children.length == 1){
-            console.log(document.getElementById("contentId").children[0].nodeName);
-            if(document.getElementById("contentId").children[0].nodeName ==  "BR"){
-                document.getElementById("contentId").innerHTML = "";
-                return;
-            }
+        let editableDiv = document.getElementById(targetId);
+
+        if(isEditableDivEmpty()){
+            return;
         }
-        let caretPosition = getCaretPosition(document.getElementById(targetId));
+
+        let caretPosition = caret.getCaretPosition(editableDiv);
         console.log(caretPosition);
 
-        let currentText = document.getElementById(targetId).innerText;
-        console.log("before", currentText);
-        currentText = currentText.replaceAll("<mark>", "");
-        currentText = currentText.replaceAll("</mark>", "");
-        console.log(currentText);
-
-        console.log(actualText, currentText);
+        let currentText = getCurrentText(editableDiv);
+        console.log("current text ...", currentText);
         let mat = lcs.findLCS(actualText, currentText);
         let commonText = lcs.findCommonText(actualText, currentText, mat);
         lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
 
-        setCaret(caretPosition);
+        caret.setCaret(editableDiv, caretPosition);
 
     }
 
@@ -205,7 +139,7 @@ function handlePaste(e) {
                 </div>
                 <div className='document'>
                     <div className='page'>
-                        <div contentEditable='true' id="contentId"  onmousemove="getCursorPosition(event)">
+                        <div contentEditable='true' id="contentId">
                            <span>Hello</span><span>world</span>
                         </div>
                     </div>
