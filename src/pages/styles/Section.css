@@ -15,50 +15,119 @@ body{
 .container{
     height: 100%;
     width: 100%;
-
     display: flex;
     justify-content: center;
-    align-items: center;
-
-    background-color: aqua;
-    
+    align-items: center;    
 }
 
 .section{
     height: 90%;
-    width: 70%;
-    background-color: beige;
+    width: 90%;
+  
     
 }
 
 .details{
     height: 100%;
-    width: 30%;
- 
+    width: 38%;
     float: left;
-
+    margin: 1%;
 }
 
-.document{
-    height: 100%;
-    width: 70%;
+.equipments{
+    background-color: bisque;
+    height: 70%;
+    width: 100%;
 
+}
+.editor{
+    height: 100%;
+    width: 58%;
     float: right;
+    margin: 1%;
+}
+.metadata{
+    height:10%;
+    width: 100%;
 }
 
-.page{
-    height: 100%;
+.title{
+    height: 30%;
+    width: 100%;
+    border-radius: 5px;
+    font-size: large;
+
+}
+
+.pagesModified{
+    height: 70%;
     width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
 }
 
-#contentId{
+.modifiedItem{
+    height: 35%;
+    width: 10%;
+    background-color: lightblue;
+    border-radius: 5px;
+    font-size: small;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+
+}
+.document{
+    height: 90%;
+    width: 100%;
+    background-color: gray;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+}
+
+#pages{
+    height: 100%;
+    width: 98%;
+    margin: auto;
+    max-height: 100%;
     overflow: auto;
-    width: 95%;
+}
+
+.page{
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.pageNumber{
+    position: absolute;
+    top: 0;
+    right: 5px;
+    background-color: lightcoral;
+    color: white;
+    padding: 5px;
+    font-size: 15px;
+    font-weight: bold;
+    
+
+}
+.content{
+    
+    width: 100%;
     height: 95%;
     resize: none;
     border: none;
     background-color: white;
+    outline: none;
+    margin-top: 10px;
 }

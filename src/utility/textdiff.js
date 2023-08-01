@@ -55,7 +55,7 @@ export default class TextDiff{
         console.log("current text ...", currentText);
         let mat = this.lcs.findLCS(this.actualText, currentText);
         let commonText = this.lcs.findCommonText(this.actualText, currentText, mat);
-        this.lcs.highlightText(document.getElementById("contentId"), commonText,  currentText);
+        this.lcs.highlightText(editableDiv, commonText,  currentText);
     }
 
     handleChange(event){
@@ -66,7 +66,7 @@ export default class TextDiff{
         }
         let targetId = event.target.id;
         let editableDiv = document.getElementById(targetId);
-
+        
          
         let caretPosition = this.caret.getCaretPosition(editableDiv);
         console.log(caretPosition);

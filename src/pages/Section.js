@@ -1,40 +1,98 @@
 import './styles/Section.css';
 import React, {  useEffect } from 'react';
-
+import parse from 'html-react-parser';
 import TextDiff from '../utility/textdiff';
+import Util from '../utility/util';
+import EquipmentsTable from '../components/Equipment';
+import { useState } from 'react';
+import {db} from '../utility/firebase'; 
+import { onValue, ref } from "firebase/database";
 
 const Section = () =>{
+    
     let textDiff = new TextDiff();
+    let util = new Util();
+
+    var pages = [];
+   
+    const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+    const[activeEquipment, setActiveEquipment] = useState('');
+    const[pagesModified, setPagesModified] = useState([]);
+
+
+
+
+
     useEffect(() => {
-        
-        let textArea = document.getElementById("contentId");
-        textArea.addEventListener('input',handleChange);
-        textArea.addEventListener("paste",handlePaste);
-        textDiff.setActualText(textArea.innerText);
-      }, []);
+        fetchDocument();            
+    }, []);
 
-  
-      const handleChange = (event)=> {
+
+    const fetchDocument = () => {
+        const query = ref(db, "document");
+        onValue(query, (snapshot) => {
+            let data= snapshot.val();
+            
+            let pagesElement = document.getElementById("pages");
+            pagesElement.innerHTML = "";
+            pages= [];
+            
+            for(const[key, value] of Object.entries(data)){
+                let page = util.createPageElement(value);
+                page.addEventListener("input", handleChange);
+                page.addEventListener("paste", handlePaste);
+                pagesElement .appendChild(page);
+                pages.push(value);
+            }
+            setIsDocumentLoaded(true);
+            
+        });
+    }
+    
+    const handleChange = (event)=> {
+        let targetId = event.target.id;
+        let content = util.getActualTextContent(pages, targetId);
+        textDiff.setActualText(content);
         textDiff.handleChange(event);
-      }
+    }
 
-      const handlePaste = (event) => {
+    const handlePaste = (event) => {
+        let targetId = event.currentTarget.id;
+        let content = util.getActualTextContent(pages, targetId);
+        textDiff.setActualText(content);
         textDiff.handlePaste(event);
-      }
-
-
-
+    }
 
     return (
         <div className='container'>
             <div className='section'>
                 <div className='details'>
-
+                    <div className='name'></div>
+                    <div className='equipments'>
+                        {isDocumentLoaded && <EquipmentsTable setEquipment ={
+                            (equipment) => {
+                                setActiveEquipment(equipment.name);
+                                setPagesModified(equipment.pagesModified);
+                        }}/>}
+                    </div>
                 </div>
-                <div className='document'>
-                    <div className='page'>
-                        <div contentEditable='true' id="contentId">
-                           <span>Hello</span><span>world</span>
+                <div className='editor'>
+                    <div className='metadata'>
+                        <div className='title'><span>{activeEquipment}</span></div>
+                        <div className='pagesModified'>
+                            
+                            {
+                                pagesModified.map((item) => 
+                                    <div className='modifiedItem'>
+                                        <span>{item}</span>
+                                    </div>
+                                )
+                            }
+                            
+                        </div>
+                    </div>
+                    <div className='document'>
+                        <div  id="pages">
                         </div>
                     </div>
                 </div>

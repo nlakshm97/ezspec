@@ -1,0 +1,14 @@
+.equipmentsTable{
+
+    border: 1px solid lightgray;
+
+}
+
+input{
+ text-align: center;
+}
+
+.equipmentName{
+    cursor: pointer;
+    text-decoration: underline;
+}

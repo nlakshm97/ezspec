@@ -103,6 +103,7 @@ export default class LCS{
         }
         textOpt += current;
         contentElementId.innerHTML = textOpt;
+        
       };
 
 
