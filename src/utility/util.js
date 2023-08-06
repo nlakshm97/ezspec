@@ -3,7 +3,7 @@ export default class Util{
 
      getActualTextContent = (pages, targetId) => {
         
-        console.log(targetId);
+       
         let content = "";
         for(let i=0;i <pages.length; i++){
             if (pages[i].id == targetId){
@@ -11,11 +11,11 @@ export default class Util{
                 break;
             }
         }
-
-        let tags = ["span", "mark"];
-        for(let i=0;i< tags.length; i++){
-            content = content.replaceAll("<"+tags[i]+">", "");
-            content = content.replaceAll("</"+tags[i]+">", "");
+        const regexp = /<[a-zA-Z0-9-="/ ]*>/g;
+        const array = [...content.matchAll(regexp)];
+   
+        for(let i=0;i< array.length; i++){
+            content = content.replaceAll(array[i], "");
         }
         return content;
      }

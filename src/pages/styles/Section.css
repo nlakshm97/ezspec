@@ -131,3 +131,11 @@ body{
     outline: none;
     margin-top: 10px;
 }
+
+.removeHighlighter{
+    background-color: white;
+}
+
+.addHighlighter{
+    background-color: yellow;
+}

@@ -6,9 +6,14 @@ export default class TextDiff{
         this.lcs = new LCS();
         this.caret = new Caret();
     }
+ 
 
     setActualText(actualText){
         this.actualText = actualText;
+    }
+
+    getActualText(){
+        return this.actualText;
     }
 
     handlePaste(event) {
@@ -17,20 +22,19 @@ export default class TextDiff{
 
 
         event.preventDefault();
-
-        let editableDiv = event.currentTarget;
+        console.log(event.target.parentElement);
+        let editableDiv = event.target.parentElement;
         let paste = (event.clipboardData || window.clipboardData).getData("text");
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
         selection.deleteFromDocument();
 
-        let spanElement = document.createElement("span");
-        spanElement.appendChild(document.createTextNode(paste));
-        selection.getRangeAt(0).insertNode(spanElement);
+        let textNode = document.createTextNode(paste);
+        selection.getRangeAt(0).insertNode(textNode);
         selection.collapseToEnd();
 
 
-        let caretPosition = this.caret.getCaretPositionDuringPaste(editableDiv, spanElement);
+        let caretPosition = this.caret.getCaretPositionDuringPaste(editableDiv, textNode);
         console.log(caretPosition);
         this.highlightText(editableDiv);
         this.caret.setCaret(editableDiv, caretPosition);
@@ -39,23 +43,46 @@ export default class TextDiff{
     }
 
     getCurrentText(editableDiv){
+        
         let text = "";
         let children = editableDiv.children;
+        let txtPos = {};
+        let idx = 0;
+        let arr = [];
         for (let i=0; i<children.length; i++){
             let child = children[i];
-            text += child.innerText;
+            let innerText = child.innerText;
+            for(let j=0;j<innerText.length; j++){
+                txtPos[idx] = [j,child];
+                idx += 1;
+            }
+            text += innerText;
+            
         }
-        console.log(text);
-        return text;
+        arr.push(text);
+        arr.push(txtPos);
+        return arr;
+    
+
     }
 
 
     highlightText(editableDiv){
-        let currentText = this.getCurrentText(editableDiv);
-        console.log("current text ...", currentText);
+
+        let arr = this.getCurrentText(editableDiv);
+
+        let currentText = arr[0];
+        let currentTextParent = arr[1];
+
         let mat = this.lcs.findLCS(this.actualText, currentText);
+        
+        console.log("actualText", this.actualText);
+        console.log("currentText", currentText);
+
         let commonText = this.lcs.findCommonText(this.actualText, currentText, mat);
-        this.lcs.highlightText(editableDiv, commonText,  currentText);
+        console.log("common", commonText);
+        this.lcs.highlightText(editableDiv, commonText,  currentText, currentTextParent);
+       
     }
 
     handleChange(event){
@@ -69,7 +96,7 @@ export default class TextDiff{
         
          
         let caretPosition = this.caret.getCaretPosition(editableDiv);
-        console.log(caretPosition);
+        console.log("caret position", caretPosition);
         this.highlightText(editableDiv);
         this.caret.setCaret(editableDiv, caretPosition);
 

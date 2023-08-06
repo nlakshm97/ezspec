@@ -41,7 +41,7 @@ const Section = () =>{
                 let page = util.createPageElement(value);
                 page.addEventListener("input", handleChange);
                 page.addEventListener("paste", handlePaste);
-                pagesElement .appendChild(page);
+                pagesElement.appendChild(page);
                 pages.push(value);
             }
             setIsDocumentLoaded(true);
@@ -51,16 +51,35 @@ const Section = () =>{
     
     const handleChange = (event)=> {
         let targetId = event.target.id;
-        let content = util.getActualTextContent(pages, targetId);
-        textDiff.setActualText(content);
+        console.log(targetId);
+        if(textDiff.getActualText() == undefined){
+            let content = util.getActualTextContent(pages, targetId);
+            textDiff.setActualText(content);
+        }
         textDiff.handleChange(event);
     }
 
     const handlePaste = (event) => {
-        let targetId = event.currentTarget.id;
+        let targetId = event.target.parentElement.getAttribute("id");
         let content = util.getActualTextContent(pages, targetId);
+        console.log("handle paste event .....");
+        console.log(content);
         textDiff.setActualText(content);
         textDiff.handlePaste(event);
+    }
+
+    const highlightText = (equipmentId) =>{
+        console.log("trying to highlight text with equipment id " + equipmentId);
+        let markElements = document.getElementsByTagName("mark");
+        for(let i=0;i < markElements.length; i++){
+            let mark = markElements[i];
+            console.log(mark);
+            mark.setAttribute("class", "addHighlighter");
+            if (mark.getAttribute("equipment") != equipmentId){
+                mark.setAttribute("class", "removeHighlighter");
+            }
+        }
+
     }
 
     return (
@@ -71,8 +90,11 @@ const Section = () =>{
                     <div className='equipments'>
                         {isDocumentLoaded && <EquipmentsTable setEquipment ={
                             (equipment) => {
+                                
                                 setActiveEquipment(equipment.name);
                                 setPagesModified(equipment.pagesModified);
+                                //highlightText(equipment.id);
+                                
                         }}/>}
                     </div>
                 </div>

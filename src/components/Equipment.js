@@ -1,5 +1,4 @@
 import './styles/Equipment.css';
-import ReactTable from "react-table";  
 import MUIDataTable from 'mui-datatables';
 import { useState, useEffect } from 'react';
 import {db} from '../utility/firebase'; 

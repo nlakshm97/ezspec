@@ -1,8 +1,10 @@
+import { child } from "firebase/database";
+
 export default class Caret{
 
     getCaretPosition(editableDiv) {
       
-        let children = editableDiv.children;
+        let children = editableDiv.childNodes;
         let cursorIndex = 0;
 
         if (window.getSelection) {
@@ -10,21 +12,29 @@ export default class Caret{
           if (sel.rangeCount) {
             let range = sel.getRangeAt(0);
             let edit = (range.commonAncestorContainer.parentNode);
-            
+            console.log("component being edited ...", edit);
+            console.log(range.endOffset);
             for(let i= 0; i<children.length; i++){    
                 if(children[i] == edit){
-                    console.log(edit, range.endOffset);
                     cursorIndex += range.endOffset;
                     break;
                 }
-                cursorIndex += children[i].innerText.length;
+                if(children[i].nodeName != "#text"){
+                    cursorIndex += children[i].innerText.length;
+                }
+                else{
+                    cursorIndex += children[i].length;
+                }
+                
             }
           }
         } 
+        console.log("calculating cursorIndex ...");
         return cursorIndex;
+       
       }
 
-      getCaretPositionDuringPaste(editableDiv, element){
+      getCaretPositionDuringPaste(editableDiv, textNode){
         let children = editableDiv.children;
         let cursorIndex = 0;
 
@@ -32,18 +42,6 @@ export default class Caret{
 
         for(let i=0;i<children.length;i++){
             let child = children[i];
-            if(child.children.length == 0){
-                cursorIndex += child.innerText.length;
-            }
-
-            console.log(children[i]);
-            if(child == element){
-                break;
-            }
-            
-            if(child.children.length == 0){
-                continue;
-            }
             let childNodes = child.childNodes;
             for(let j=0;j<childNodes.length;j++){
                 if(childNodes[j].nodeName == "#text"){
@@ -52,7 +50,7 @@ export default class Caret{
                 else{
                     cursorIndex += childNodes[j].innerText.length;
                 }
-                if(childNodes[j] == element){
+                if(childNodes[j] == textNode){
                     isInnerLoopBreak = true;
                     break;
                 }
@@ -68,16 +66,23 @@ export default class Caret{
 
       setCaret(editableDiv, pos) {
         
-        let children = editableDiv.children;
+        let children = editableDiv.childNodes;
         var range = document.createRange();
         var sel = window.getSelection();
 
         
         let cursorIndex = 0;
         let element= null;
-        console.log(editableDiv, editableDiv.children);
+       
         for(let i= 0; i<children.length; i++){
-            let len = children[i].innerText.length;
+            let len = 0;
+            if(children[i].nodeName == "#text"){
+                len = children[i].length;
+            }
+            else{
+                len = children[i].innerText.length;
+            }
+            
             if (cursorIndex + len >= pos){
                 element = children[i];
                 break;
