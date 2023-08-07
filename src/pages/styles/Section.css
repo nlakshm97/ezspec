@@ -111,7 +111,7 @@ body{
 
 .pageNumber{
     position: absolute;
-    top: 0;
+    top: -30px;
     right: 5px;
     background-color: lightcoral;
     color: white;
@@ -129,7 +129,7 @@ body{
     border: none;
     background-color: white;
     outline: none;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 .removeHighlighter{

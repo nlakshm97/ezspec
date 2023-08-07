@@ -6,17 +6,19 @@ export default class Caret{
       
         let children = editableDiv.childNodes;
         let cursorIndex = 0;
-
+        let edit = undefined;
+        let endOffset = undefined;
         if (window.getSelection) {
           let sel = window.getSelection();
           if (sel.rangeCount) {
             let range = sel.getRangeAt(0);
-            let edit = (range.commonAncestorContainer.parentNode);
+            edit = (range.commonAncestorContainer.parentNode);
             console.log("component being edited ...", edit);
             console.log(range.endOffset);
             for(let i= 0; i<children.length; i++){    
                 if(children[i] == edit){
                     cursorIndex += range.endOffset;
+                    endOffset = range.endOffset;
                     break;
                 }
                 if(children[i].nodeName != "#text"){
@@ -30,7 +32,11 @@ export default class Caret{
           }
         } 
         console.log("calculating cursorIndex ...");
-        return cursorIndex;
+        let arr  = [];
+        arr.push(edit);
+        arr.push(cursorIndex);
+        arr.push(endOffset);
+        return arr;
        
       }
 

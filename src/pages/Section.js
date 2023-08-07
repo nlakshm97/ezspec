@@ -17,6 +17,7 @@ const Section = () =>{
    
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const[activeEquipment, setActiveEquipment] = useState('');
+    const[activeEquipmentId, setActiveEquipmentId] = useState('');
     const[pagesModified, setPagesModified] = useState([]);
 
 
@@ -56,7 +57,9 @@ const Section = () =>{
             let content = util.getActualTextContent(pages, targetId);
             textDiff.setActualText(content);
         }
-        textDiff.handleChange(event);
+        let equipmentId=  document.getElementById("equip-id").innerHTML;
+        textDiff.handleChange(event, equipmentId);
+        highlightText(equipmentId)
     }
 
     const handlePaste = (event) => {
@@ -65,7 +68,8 @@ const Section = () =>{
         console.log("handle paste event .....");
         console.log(content);
         textDiff.setActualText(content);
-        textDiff.handlePaste(event);
+        let equipmentId=  document.getElementById("equip-id").innerHTML;
+        textDiff.handlePaste(event, equipmentId);
     }
 
     const highlightText = (equipmentId) =>{
@@ -73,7 +77,6 @@ const Section = () =>{
         let markElements = document.getElementsByTagName("mark");
         for(let i=0;i < markElements.length; i++){
             let mark = markElements[i];
-            console.log(mark);
             mark.setAttribute("class", "addHighlighter");
             if (mark.getAttribute("equipment") != equipmentId){
                 mark.setAttribute("class", "removeHighlighter");
@@ -90,17 +93,18 @@ const Section = () =>{
                     <div className='equipments'>
                         {isDocumentLoaded && <EquipmentsTable setEquipment ={
                             (equipment) => {
-                                
+                                console.log(equipment.id);
                                 setActiveEquipment(equipment.name);
+                                setActiveEquipmentId(equipment.id);
                                 setPagesModified(equipment.pagesModified);
-                                //highlightText(equipment.id);
+                                highlightText(equipment.id);
                                 
                         }}/>}
                     </div>
                 </div>
                 <div className='editor'>
                     <div className='metadata'>
-                        <div className='title'><span>{activeEquipment}</span></div>
+                        <div className='title'><span>{activeEquipment}</span><span>-</span><span  id="equip-id">{activeEquipmentId}</span></div>
                         <div className='pagesModified'>
                             
                             {

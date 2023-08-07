@@ -11,13 +11,16 @@ export default class Util{
                 break;
             }
         }
-        const regexp = /<[a-zA-Z0-9-="/ ]*>/g;
-        const array = [...content.matchAll(regexp)];
-   
-        for(let i=0;i< array.length; i++){
-            content = content.replaceAll(array[i], "");
+
+        content = parse(content);
+        let text = "";
+        for(let i=0;i< content.length; i++){
+           if(content[i].type == "span"){
+            text += content[i].props.children;
+           }
         }
-        return content;
+        console.log(text);
+        return text;
      }
 
      createPageElement = (value) => {
