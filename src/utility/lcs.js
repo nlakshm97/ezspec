@@ -62,7 +62,7 @@ export default class LCS{
         }
         let element = document.createElement("mark");
     
-        let itr = LCS.count;
+        let itr = Date.now();
         element = document.createElement("span");
         element.setAttribute("id", "span-"+itr);
         if (type == "mark"){

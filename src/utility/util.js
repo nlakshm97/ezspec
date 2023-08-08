@@ -23,7 +23,7 @@ export default class Util{
         return text;
      }
 
-     createPageElement = (value) => {
+     createPageElement = (idx, value) => {
 
         let pageElement = document.createElement('div');
         pageElement.setAttribute("class", "page");
@@ -36,8 +36,12 @@ export default class Util{
 
         let pageIdElement = document.createElement("span");
         pageIdElement.setAttribute("class", "pageNumber");
+        if (idx == 0){
+            contentEditableDiv.style.marginTop = "30px";
+        }
         pageIdElement.innerHTML = value["id"];
 
+       
 
         pageElement.appendChild(contentEditableDiv);
         pageElement.appendChild(pageIdElement);

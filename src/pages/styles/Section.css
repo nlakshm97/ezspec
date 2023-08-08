@@ -52,7 +52,7 @@ body{
 }
 
 .title{
-    height: 30%;
+    height: 40%;
     width: 100%;
     border-radius: 5px;
     font-size: large;
@@ -60,7 +60,7 @@ body{
 }
 
 .pagesModified{
-    height: 70%;
+    height: 60%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -129,7 +129,7 @@ body{
     border: none;
     background-color: white;
     outline: none;
-    margin-top: 30px;
+  
 }
 
 .removeHighlighter{
@@ -138,4 +138,21 @@ body{
 
 .addHighlighter{
     background-color: yellow;
+}
+
+.displayNone{
+    display: none;
+}
+
+.save{
+    color: white ;
+    background-color: #007AFF;
+    border: none;
+    border-radius: 5px;
+    height: 100%;
+    width: 15%;
+    float: right;
+    font-weight: bold;
+    cursor: pointer;
+   
 }

@@ -65,7 +65,7 @@ export default class TextDiff{
        
         this.handleMarkInsideDifferentMark(elementEdited, editableDiv, startOffset, endOffset, equipmentId,isNewMarkElementAddedToBack,isNewMarkElementAddedToFront, originalText);
 
-        //this.highlightText(editableDiv, equipmentId);
+        this.highlightText(editableDiv, equipmentId);
         //this.caret.setCaret(editableDiv, caretPosition);
     
         

@@ -1,12 +1,13 @@
 import './styles/Section.css';
-import React, {  useEffect } from 'react';
+import React,  {  useEffect } from 'react';
 import parse from 'html-react-parser';
 import TextDiff from '../utility/textdiff';
 import Util from '../utility/util';
 import EquipmentsTable from '../components/Equipment';
 import { useState } from 'react';
 import {db} from '../utility/firebase'; 
-import { onValue, ref } from "firebase/database";
+import { child, onValue, ref } from "firebase/database";
+import { Button } from '@mui/base';
 
 const Section = () =>{
     
@@ -37,39 +38,56 @@ const Section = () =>{
             let pagesElement = document.getElementById("pages");
             pagesElement.innerHTML = "";
             pages= [];
-            
+
+            let i= 0;
             for(const[key, value] of Object.entries(data)){
-                let page = util.createPageElement(value);
+                let page = util.createPageElement(i, value);
                 page.addEventListener("input", handleChange);
                 page.addEventListener("paste", handlePaste);
                 pagesElement.appendChild(page);
                 pages.push(value);
+                i += 1;
             }
             setIsDocumentLoaded(true);
             
         });
     }
     
+    const handlePagesModified = (equipmentId) =>{
+        let pagesModified = [];
+        let pages = document.getElementsByClassName("content");
+        for(let i=0;i < pages.length;i ++){
+            let children = pages[i].children;
+            for(let j =0;j<children.length; j ++){
+                if (children[j].nodeName== "MARK" && children[j].getAttribute("equipment") == equipmentId){
+                    pagesModified.push(pages[i].id);
+                }
+            }
+        }
+        setPagesModified(pagesModified);
+    }
+
     const handleChange = (event)=> {
         let targetId = event.target.id;
         console.log(targetId);
-        if(textDiff.getActualText() == undefined){
-            let content = util.getActualTextContent(pages, targetId);
-            textDiff.setActualText(content);
-        }
+       
+        let content = util.getActualTextContent(pages, targetId);
+        textDiff.setActualText(content);
+        
         let equipmentId=  document.getElementById("equip-id").innerHTML;
         textDiff.handleChange(event, equipmentId);
         highlightText(equipmentId)
+        handlePagesModified(equipmentId);
     }
 
     const handlePaste = (event) => {
         let targetId = event.target.parentElement.getAttribute("id");
         let content = util.getActualTextContent(pages, targetId);
-        console.log("handle paste event .....");
-        console.log(content);
         textDiff.setActualText(content);
         let equipmentId=  document.getElementById("equip-id").innerHTML;
         textDiff.handlePaste(event, equipmentId);
+        highlightText(equipmentId)
+        handlePagesModified(equipmentId);
     }
 
     const highlightText = (equipmentId) =>{
@@ -96,15 +114,19 @@ const Section = () =>{
                                 console.log(equipment.id);
                                 setActiveEquipment(equipment.name);
                                 setActiveEquipmentId(equipment.id);
-                                setPagesModified(equipment.pagesModified);
                                 highlightText(equipment.id);
+                                handlePagesModified(equipment.id);
                                 
                         }}/>}
                     </div>
                 </div>
                 <div className='editor'>
                     <div className='metadata'>
-                        <div className='title'><span>{activeEquipment}</span><span>-</span><span  id="equip-id">{activeEquipmentId}</span></div>
+                        <div className='title'>
+
+                            <span>{activeEquipment}</span><span className="displayNone" id="equip-id">{activeEquipmentId}</span>
+                            <Button className='save'>SAVE</Button>
+                        </div>
                         <div className='pagesModified'>
                             
                             {
