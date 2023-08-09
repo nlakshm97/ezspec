@@ -14,12 +14,20 @@ export default class Util{
 
         content = parse(content);
         let text = "";
-        for(let i=0;i< content.length; i++){
-           if(content[i].type == "span"){
-            text += content[i].props.children;
-           }
+        if(content.length){
+            for(let i=0;i< content.length; i++){
+            
+                if(content[i].type == "span"){
+                    text += content[i].props.children;
+                }
+            }
         }
-        console.log(text);
+        else{
+            if(content.type == "span"){
+                text += content.props.children;
+            }
+        }
+        
         return text;
      }
 

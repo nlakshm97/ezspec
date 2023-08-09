@@ -6,7 +6,7 @@ import Util from '../utility/util';
 import EquipmentsTable from '../components/Equipment';
 import { useState } from 'react';
 import {db} from '../utility/firebase'; 
-import { child, onValue, ref } from "firebase/database";
+import { child, onValue, ref , set} from "firebase/database";
 import { Button } from '@mui/base';
 
 const Section = () =>{
@@ -17,6 +17,7 @@ const Section = () =>{
     var pages = [];
    
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+    const[section, setSection] = useState('hardware');
     const[activeEquipment, setActiveEquipment] = useState('');
     const[activeEquipmentId, setActiveEquipmentId] = useState('');
     const[pagesModified, setPagesModified] = useState([]);
@@ -26,12 +27,12 @@ const Section = () =>{
 
 
     useEffect(() => {
-        fetchDocument();            
+        fetchDocument("hardware");            
     }, []);
 
 
-    const fetchDocument = () => {
-        const query = ref(db, "document");
+    const fetchDocument = (sectionId) => {
+        const query = ref(db, "document/"+ sectionId);
         onValue(query, (snapshot) => {
             let data= snapshot.val();
             
@@ -61,6 +62,7 @@ const Section = () =>{
             for(let j =0;j<children.length; j ++){
                 if (children[j].nodeName== "MARK" && children[j].getAttribute("equipment") == equipmentId){
                     pagesModified.push(pages[i].id);
+                    break;
                 }
             }
         }
@@ -103,11 +105,26 @@ const Section = () =>{
 
     }
 
+    const handleSave = (sectionId) => {
+        console.log("save called");
+        let data = {};
+        let pages = document.getElementsByClassName("content");
+        for(let i=0;i < pages.length;i ++){
+            let page = pages[i];
+            data[page.id] = {"content":page.innerHTML, "id":page.id};
+
+        }
+        set(ref(db, 'document/' + sectionId), data);
+
+    }
+
     return (
         <div className='container'>
-            <div className='section'>
+            <div className='job'>
                 <div className='details'>
-                    <div className='name'></div>
+                    <div className='section'>
+
+                    </div>
                     <div className='equipments'>
                         {isDocumentLoaded && <EquipmentsTable setEquipment ={
                             (equipment) => {
@@ -125,7 +142,7 @@ const Section = () =>{
                         <div className='title'>
 
                             <span>{activeEquipment}</span><span className="displayNone" id="equip-id">{activeEquipmentId}</span>
-                            <Button className='save'>SAVE</Button>
+                            <Button className='save' onClick={() => {handleSave(section)}}>SAVE</Button>
                         </div>
                         <div className='pagesModified'>
                             

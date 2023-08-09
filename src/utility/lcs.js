@@ -76,7 +76,7 @@ export default class LCS{
         elementsToBeReplaced.push(element);
       }
 
-      addToSequence(j, currentTextParent, sequence, type, equipmentId){
+      addToSequence(j, currentTextParent, sequence, type){
         let idx = currentTextParent[j][0]
         let node = currentTextParent[j][1];
         
@@ -102,6 +102,7 @@ export default class LCS{
         for(let each in sequence){
          
           let value = sequence[each];
+          console.log(each);
 
           let element =  document.getElementById(each.toString());
           console.log(element, equipmentId);
@@ -196,19 +197,19 @@ export default class LCS{
   
         while (i < commonText.length && j < currentText.length) {
           if (commonText[i] == currentText[j]) {
-            this.addToSequence(j, currentTextParent, commonSequence, "SPAN", equipmentId)
+            this.addToSequence(j, currentTextParent, commonSequence, "SPAN")
 
             i++;
             j++;
           } 
           else {
             
-           this.addToSequence(j, currentTextParent, changedSequence, "MARK", equipmentId );   
+           this.addToSequence(j, currentTextParent, changedSequence, "MARK" );   
             j++;
           }
         }
         while (j < currentText.length) {
-            this.addToSequence(j, currentTextParent, changedSequence, "MARK" , equipmentId);     
+            this.addToSequence(j, currentTextParent, changedSequence, "MARK" );     
             j++;
         }
         

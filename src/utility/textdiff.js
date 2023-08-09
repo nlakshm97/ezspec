@@ -141,7 +141,7 @@ export default class TextDiff{
 
         let currentText = arr[0];
         let currentTextParent = arr[1];
-
+        
         let mat = this.lcs.findLCS(this.actualText, currentText);
         
         console.log("actualText", this.actualText);

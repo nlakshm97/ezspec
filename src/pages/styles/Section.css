@@ -20,18 +20,26 @@ body{
     align-items: center;    
 }
 
-.section{
+.job{
     height: 90%;
     width: 90%;
   
     
 }
 
+
+
 .details{
     height: 100%;
     width: 38%;
     float: left;
     margin: 1%;
+}
+
+.section{
+    height: 30%;
+    width: 100%;
+    background-color: lightblue;
 }
 
 .equipments{
