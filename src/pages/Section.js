@@ -25,6 +25,8 @@ const Section = () =>{
     Size.whitelist = ['14px', '15px', '16px', '17px','18px'];
     Quill.register(Size, true);
 
+    var previousId = null;
+
     var toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
         ['blockquote', 'code-block', 'link'],
@@ -74,7 +76,7 @@ const Section = () =>{
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const[section, setSection] = useState('hardware');
     const[activeEquipment, setActiveEquipment] = useState('');
-    const[activeEquipmentId, setActiveEquipmentId] = useState(null);
+    var [activeEquipmentId, setActiveEquipmentId] = useState(null);
     const[pagesModified, setPagesModified] = useState([]);
 
     const [highlight, setHighlight] = useState(false);
@@ -171,22 +173,7 @@ const Section = () =>{
         console.log(diff);
 
         let quilText = quil.current.getEditor().getText();
-        
-        let i=0;
-        let j = 0;
-        let dct = {};
-        while (i < currentText.length && j< quilText.length){
-            if(currentText[i] == quilText[j]){
-                dct[i] = j;
-                i += 1;
-                j += 1;
-            }
-            else{
-                j += 1;
-            }
-        }
-     
-        //console.log(quil);
+        console.log(quilText);
         
         
         try{
@@ -195,10 +182,8 @@ const Section = () =>{
                 for(let i=0;i<diff.length;i++){
                     let start = diff[i][0];
                     let end = diff[i][1];
-                   
-                    
-                    console.log(dct[start], dct[end]);
-                    quil.current.getEditor().formatText(dct[start], dct[end] - dct[start] + 2, {        
+                
+                    quil.current.getEditor().formatText(start, end - start, {        
                         'underline': true
                     });
                 }
@@ -214,20 +199,47 @@ const Section = () =>{
         
     }
 
-    const unmountEquipment = (equipmentId) => {
+    const unmountEquipment = (equipmentId, activeEquipmentId, setActiveEquipmentId) => {
         console.log("unmounting equipment ...");
-        
+        console.log( equipmentId, activeEquipmentId);
 
-        if(activeEquipmentId != null){
-            console.log("equipment is being unmounted ....", activeEquipmentId);
+        if(equipmentId!= null){
+            console.log("equipment is being unmounted ....", equipmentId);
             let elements = document.getElementsByTagName("u");
-            console.log(elements);
+       
             for(let i=0;i< elements.length;i++){
-                
-                elements[i].setAttribute("equipment", equipmentId);
-                elements[i].setAttribute("class", "removeHighlighter");
+                console.log(elements[i].getAttribute("equipment"));
+                if(elements[i].getAttribute("equipment") == null){
+                    console.log(elements[i]);
+                    elements[i].setAttribute("equipment", equipmentId);
+                    elements[i].setAttribute("class", "removeHighlighter");
+                }
             }
         }
+       
+        
+    }
+
+
+    const mountEquipment = (equipmentId) => {
+        console.log("mounting equipment ...", equipmentId);
+        let elements = document.getElementsByTagName("u");
+        console.log(elements);
+        for(let i=0;i< elements.length;i++){
+            if(elements[i].getAttribute("equipment")){
+               if(elements[i].getAttribute("equipment") == equipmentId){
+                elements[i].setAttribute("class", "addHighlighter");
+               }
+               else{
+                elements[i].setAttribute("class", "removeHighlighter");
+               }
+            }
+        }
+     
+    }
+
+    const setEquipmentName = (equipmentName) => {
+        document.getElementById("equip-id").innerHTML = equipmentName;
     }
 
 
@@ -242,9 +254,22 @@ const Section = () =>{
                         {isDocumentLoaded && <EquipmentsTable setEquipment ={
                             (equipment) => {
                                 console.log(equipment.id);
-                                unmountEquipment(equipment.id);
-                                setActiveEquipment(equipment.name);
-                                setActiveEquipmentId(equipment.id); 
+                                console.log(activeEquipmentId);
+                     
+                                unmountEquipment(activeEquipmentId, equipment.id, setActiveEquipmentId);
+                                mountEquipment(equipment.id);
+
+                                let elements = document.getElementsByClassName("ql-editor");
+                                let values= [];
+                                for(let i=0;i<elements.length; i++){
+                          
+                                    pages[i].content = elements[i].innerHTML;
+                                   
+                                }
+                            
+                                activeEquipmentId = equipment.id;
+                                setEquipmentName(equipment.name);
+                  
                                 
                         }}/>}
                     </div>
@@ -253,7 +278,7 @@ const Section = () =>{
                     <div className='metadata'>
                         <div className='title'>
 
-                            <span>{activeEquipment}</span><span className="displayNone" id="equip-id">{activeEquipmentId}</span>
+                            <span>{activeEquipment}</span><span  id="equip-id">{activeEquipmentId}</span>
                             <Button className='save' onClick={() => {handleSave(section)}}>SAVE</Button>
                         </div>
                         <div className='pagesModified'>
@@ -277,7 +302,7 @@ const Section = () =>{
                             
                         
                             pages.map((page, i) => {
-                                
+                                console.log(page.content);
                                     return (
                                         <div class="content">
                                             <ReactQuill
@@ -286,7 +311,8 @@ const Section = () =>{
                                                 modules={modules}
                                                 formats={formats}
                                                 value={page.content}
-                                                onChange={(html, delta, source, editor) => {handleEditorChange(value, i, activeEquipment, source)}} 
+                                                onChange={(html, delta, source, editor) => {
+                                                    handleEditorChange(value, i, activeEquipment, source)}} 
                                             />
                                         </div>
                                     )
