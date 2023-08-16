@@ -1,34 +1,18 @@
+import { textAlign } from '@mui/system';
+import { child } from 'firebase/database';
 import parse from 'html-react-parser';
 export default class Util{
 
      getActualTextContent = (pages, targetId) => {
         
-       
-        let content = "";
+       console.log("gettign actual text content ..");
         for(let i=0;i <pages.length; i++){
             if (pages[i].id == targetId){
-                content = pages[i].content;
-                break;
+                return pages[i].text;
             }
         }
 
-        content = parse(content);
-        let text = "";
-        if(content.length){
-            for(let i=0;i< content.length; i++){
-            
-                if(content[i].type == "span"){
-                    text += content[i].props.children;
-                }
-            }
-        }
-        else{
-            if(content.type == "span"){
-                text += content.props.children;
-            }
-        }
-        
-        return text;
+        return "";
      }
 
      createPageElement = (idx, value) => {
@@ -38,7 +22,10 @@ export default class Util{
 
         let contentEditableDiv = document.createElement('div');
         contentEditableDiv.setAttribute("class", "content");
-        contentEditableDiv.innerHTML =value["content"];
+
+        let spanElement = document.createElement("span");
+        spanElement.innerHTML = value["content"];
+        contentEditableDiv.innerHTML = value["content"];
         contentEditableDiv.setAttribute("contenteditable", true);
         contentEditableDiv.setAttribute("id", value["id"]);
 
@@ -54,5 +41,71 @@ export default class Util{
         pageElement.appendChild(contentEditableDiv);
         pageElement.appendChild(pageIdElement);
         return pageElement;
+     }
+
+     getCurrentText = (targetId) =>
+     
+     {
+        let editableDiv = document.getElementById(targetId);
+        let children = editableDiv.childNodes;
+        let text = "";
+
+        for(let i=0;i < children.length; i++){
+            let child = children[i];
+            if(child.nodeName == "#text"){
+                text += child.nodeValue;
+            }else{
+                text += child.innerText;
+            }
+        }
+        return text;
+     }
+
+     splitElement = () => {
+
+     }
+
+     handleSelection(start, end, startOffset, endOffset){
+       let elements  = document.getElementsByClassName("content");
+       for(let i=0;i <elements.length; i++){
+        let children = elements[i].childNodes;
+        for(let j=0;j < children.length; j++){
+            if(children[i] == start){
+                if(startOffset != 0){
+
+                }
+            }
+        }
+       }
+
+
+     }
+
+
+     dfs(element) {
+
+        if(element.nodeName == "#text"){
+            this.text += element.nodeValue;
+            return;
+        }
+      
+        let children = element.childNodes;
+        console.log(element, children, children.length, element.innerHTML);
+        
+        for(let i=0; i<children.length; i++){
+            this.dfs(children[i]);
+        }
+     }
+
+     getText(element) {
+        this.text = "";
+        this.dfs(element);
+        return this.text;
+
+     }
+
+
+     highlightText(element, start, end){
+
      }
 }

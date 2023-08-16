@@ -32,24 +32,81 @@ export default class LCS{
         return matrix;
       }
 
-      findCommonText(text1, text2, matrix) {
+      rec(i, visited, diff){
+    
+          visited[i] = true
+          if (i + 1 < diff.length &&  diff[i] + 1 == diff[i+1]){
+              return this.rec(i + 1, visited, diff)
+          }
+          return diff[i]
+      }
+    
 
+  dfs(diff){
+      
+      let rng = []
+      
+      let n = diff.length;
+     // console.log(diff);
+      let visited = [];
+      for(let i=0;i<n;i++){
+        visited.push(false);
+      }
+      
+      for (let i=0;i< n;i++){
+          
+          if (! visited[i])
+          {
+              let start = diff[i];
+              let end = this.rec(i, visited, diff);
+              rng.push([start, end])
+          }
+      }
+        
+      return rng
+    }
+      findCommonText(text1, text2, matrix) {
+        
         let i = text1.length;
         let j = text2.length; 
         let reverseCommonText = '';
+        let diff = [];
 
+       // console.log(diff);
+        let similar = [];
         while (i > 0 && j > 0) {
           if (text1[i - 1] == text2[j - 1]) {
             reverseCommonText = reverseCommonText + text1[i - 1];
             i = i - 1;
             j = j - 1;
+            similar.push(j-1);
           } 
           else {
-            if (matrix[i - 1][j] > matrix[i][j - 1]) i = i - 1;
-            else j = j - 1;
+            if (matrix[i - 1][j] > matrix[i][j - 1]) {
+              i = i - 1;
+             
+            }
+            else {
+              j = j - 1;
+          
+            }
           }
         }
-        return reverseCommonText.split('').reverse().join('');
+
+        for(let k=0;k<text2.length; k++){
+     
+          if(!similar.includes(k)){
+            diff.push(k);
+          }
+        }
+        //return reverseCommonText.split('').reverse().join('');
+        console.log("printing difference in text ...");
+        console.log(diff);
+        //diff.reverse();
+        similar.reverse();
+
+        let ans = [this.dfs(similar), this.dfs(diff)];
+        return ans;
       }
 
   

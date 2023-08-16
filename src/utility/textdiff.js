@@ -141,11 +141,13 @@ export default class TextDiff{
 
         let currentText = arr[0];
         let currentTextParent = arr[1];
+
+        console.log("actualText", this.actualText);
+        console.log("currentText", currentText);
         
         let mat = this.lcs.findLCS(this.actualText, currentText);
         
-        console.log("actualText", this.actualText);
-        console.log("currentText", currentText);
+        
 
         let commonText = this.lcs.findCommonText(this.actualText, currentText, mat);
         console.log("common", commonText);
@@ -156,7 +158,7 @@ export default class TextDiff{
     handleChange(event, equipmentId){
         console.log("handle change called ...");
      
-        if (event.inputType == "insertFromPaste"){
+        if (event.inputType == "insertFromPaste" || event.inputType == "insertParagraph"){
             return;
         }
         let targetId = event.target.id;
@@ -195,5 +197,40 @@ export default class TextDiff{
         this.highlightText(editableDiv, equipmentId);
         this.caret.setCaret(editableDiv, caretPosition);
 
+    }
+
+
+
+    dfs(element, equipmentId, lock){
+        let children = element.children;
+
+        if(children.length == 0){
+          
+
+            let start = this.textLen;
+            this.textLen += element.innerText.length;
+            this.text += element.innerText;
+            if(element.nodeName == "U"){
+                
+                if (element.getAttribute("equipment") != null && element.getAttribute("equipment") != equipmentId ){
+                    lock.push([start, this.textLen]);
+                }
+            }
+            return;
+        }
+        for(let i=0; i<children.length; i++){
+            this.dfs(children[i], equipmentId, lock);
+        }
+    }
+
+    getLocks (element, equipmentId) {
+        let lock = [];
+        this.textLen = 0;
+        this.text = "";
+     
+        this.dfs(element, equipmentId, lock);
+        
+        console.log(lock);
+        return lock;
     }
 }

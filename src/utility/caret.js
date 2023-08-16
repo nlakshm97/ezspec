@@ -102,6 +102,8 @@ export default class Caret{
            return;
         }
         
+        let innerChildren = element.childNodes[0].childNodes;
+        console.log(innerChildren);
          
         range.setStart(element.childNodes[0],pos-cursorIndex);
         range.collapse(true);

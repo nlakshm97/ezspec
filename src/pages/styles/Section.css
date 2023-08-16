@@ -60,7 +60,7 @@ body{
 }
 
 .title{
-    height: 40%;
+    height: 20%;
     width: 100%;
     border-radius: 5px;
     font-size: large;
@@ -68,7 +68,7 @@ body{
 }
 
 .pagesModified{
-    height: 60%;
+    height: 40%;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -76,6 +76,12 @@ body{
     align-items: center;
 }
 
+
+.textToolBar{
+    height: 60%;
+    width: 100%;
+    background-color: aliceblue;
+}
 .modifiedItem{
     height: 35%;
     width: 10%;
@@ -137,6 +143,7 @@ body{
     border: none;
     background-color: white;
     outline: none;
+    
   
 }
 
@@ -151,7 +158,9 @@ body{
 .displayNone{
     display: none;
 }
-
+u{
+    background-color: yellow;
+}
 .save{
     color: white ;
     background-color: #007AFF;
@@ -164,3 +173,32 @@ body{
     cursor: pointer;
    
 }
+
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14px"]::before {
+    content: '14px';
+    font-size: 14px !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="15px"]::before {
+    content: '15px';
+    font-size: 15px !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16px"]::before {
+    content: '16px';
+    font-size: 16px !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="17px"]::before {
+    content: '17px';
+    font-size: 17px !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="18px"]::before {
+    content: '18px';
+    font-size: 18px !important;
+}
+
+
+  
