@@ -65,6 +65,7 @@ const Section = () =>{
 
 
     const [pages, setPages] = useState([]);
+    const [actualPages, setActualPages] = useState([]);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
 
     
@@ -73,7 +74,7 @@ const Section = () =>{
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const[section, setSection] = useState('hardware');
     const[activeEquipment, setActiveEquipment] = useState('');
-    const[activeEquipmentId, setActiveEquipmentId] = useState('');
+    const[activeEquipmentId, setActiveEquipmentId] = useState(null);
     const[pagesModified, setPagesModified] = useState([]);
 
     const [highlight, setHighlight] = useState(false);
@@ -108,82 +109,12 @@ const Section = () =>{
             }
             setIsDocumentLoaded(true);
             setPages(values);
+            setActualPages(values);
         });
         
     }
 
-    const handleEnter = (event) =>{ 
-        if(event.keyCode == 13){
-            event.preventDefault();
-            document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
-            return false;
-        }
-    }
-    
-    const handlePagesModified = (equipmentId) =>{
-        let pagesModified = [];
-        let pages = document.getElementsByClassName("content");
-        for(let i=0;i < pages.length;i ++){
-            let children = pages[i].children;
-            for(let j =0;j<children.length; j ++){
-                if (children[j].nodeName== "MARK" && children[j].getAttribute("equipment") == equipmentId){
-                    pagesModified.push(pages[i].id);
-                    break;
-                }
-            }
-        }
-        setPagesModified(pagesModified);
-    }
 
-    const handleChange = (event)=> {
-
-        if(event.inputType == "insertParagraph"){
-            return;
-        }
-        console.log(event);
-        let targetId = event.target.id;
-        console.log(targetId);
-
-       
-       
-        let content = util.getActualTextContent(pages, targetId);
-        textDiff.setActualText(content);
-        
-        let equipmentId=  document.getElementById("equip-id").innerHTML;
-        textDiff.handleChange(event, equipmentId);
-        highlightText(equipmentId)
-        handlePagesModified(equipmentId);
-    }
-
-    const handlePaste = (event) => {
-
-        if(event.inputType == "insertParagraph"){
-            return;
-        }
-        let targetId = event.target.parentElement.getAttribute("id");
-        let content = util.getActualTextContent(pages, targetId);
-        textDiff.setActualText(content);
-        let equipmentId=  document.getElementById("equip-id").innerHTML;
-        textDiff.handlePaste(event, equipmentId);
-        highlightText(equipmentId)
-        handlePagesModified(equipmentId);
-    }
-
-    const highlightText = (equipmentId) =>{
-        console.log("trying to highlight text with equipment id " + equipmentId);
-        /*
-        let markElements = document.getElementsByTagName("mark");
-        for(let i=0;i < markElements.length; i++){
-            let mark = markElements[i];
-            mark.setAttribute("class", "addHighlighter");
-            if (mark.getAttribute("equipment") != equipmentId){
-                mark.setAttribute("class", "removeHighlighter");
-            }
-        }
-        */
-       
-
-    }
 
     const handleSave = (sectionId) => {
         console.log("save called");
@@ -223,9 +154,9 @@ const Section = () =>{
         console.log(locks);
         let currentText = util.getText(page);
         console.log(currentText);
-        let actualText = pages[pgIdx].text;
+        let actualText = actualPages[pgIdx].text;
 
-
+        pages[pgIdx].content = page.innerHTML;
 
        // console.log(currentText);
        // console.log(currentText.length);
@@ -277,14 +208,26 @@ const Section = () =>{
 
         }   
         
-        
+        setPages(pages);
 
     
         
     }
 
-    const mountEquipment = (equipmentId) => {
+    const unmountEquipment = (equipmentId) => {
+        console.log("unmounting equipment ...");
+        
 
+        if(activeEquipmentId != null){
+            console.log("equipment is being unmounted ....", activeEquipmentId);
+            let elements = document.getElementsByTagName("u");
+            console.log(elements);
+            for(let i=0;i< elements.length;i++){
+                
+                elements[i].setAttribute("equipment", equipmentId);
+                elements[i].setAttribute("class", "removeHighlighter");
+            }
+        }
     }
 
 
@@ -299,11 +242,9 @@ const Section = () =>{
                         {isDocumentLoaded && <EquipmentsTable setEquipment ={
                             (equipment) => {
                                 console.log(equipment.id);
+                                unmountEquipment(equipment.id);
                                 setActiveEquipment(equipment.name);
-                                setActiveEquipmentId(equipment.id);
-                                mountEquipment(equipment.id);
-                                
-                                
+                                setActiveEquipmentId(equipment.id); 
                                 
                         }}/>}
                     </div>
@@ -334,7 +275,7 @@ const Section = () =>{
                     <div className='document'>
                         {
                             
-                         
+                        
                             pages.map((page, i) => {
                                 
                                     return (

@@ -90,8 +90,6 @@ export default class Util{
         }
       
         let children = element.childNodes;
-        console.log(element, children, children.length, element.innerHTML);
-        
         for(let i=0; i<children.length; i++){
             this.dfs(children[i]);
         }
