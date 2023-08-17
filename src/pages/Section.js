@@ -25,7 +25,7 @@ const Section = () =>{
     Size.whitelist = ['14px', '15px', '16px', '17px','18px'];
     Quill.register(Size, true);
 
-    var previousId = null;
+   
 
     var toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -75,14 +75,13 @@ const Section = () =>{
 
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const[section, setSection] = useState('hardware');
-    const[activeEquipment, setActiveEquipment] = useState('');
     var [activeEquipmentId, setActiveEquipmentId] = useState(null);
-    const[pagesModified, setPagesModified] = useState([]);
+    
 
-    const [highlight, setHighlight] = useState(false);
     const [editorValue, setEditorValue] = useState('');
     const [value, setValue] = useState('');
 
+    var modifiedPages = [];
     
 
 
@@ -134,48 +133,48 @@ const Section = () =>{
 
     }
 
+
+    const handlePagesModified = () =>{
+
+        
+        console.log("handling pages modified ...");
+        let activeEquipmentId = localStorage.getItem("activeEquipmentId");
+        
+        let pages = document.getElementsByClassName("ql-editor");
+        let values = [];
+        for(let i=0;i<pages.length;i++){
+             let page = pages[i];
+             let underlineElements = page.querySelectorAll('[equipment='+activeEquipmentId+']');
+             if(underlineElements.length > 0){
+                values.push("page-"+i.toString());
+             }
+        }
+        modifiedPages = values;
+        setPagesModified();
+    }
+
     
     
     
-    const handleEditorChange= (value, pgIdx, equipmentId, source) => {
-        console.log("here ....");
-        console.log(source);
+    const handleEditorChange= ( pgIdx, source) => {
+ 
+    
         if(source == "api"){
             return;
         }
       
-     
-
-        //console.log(value);
         
         let page = document.getElementsByClassName("ql-editor")[pgIdx];
-        
-        let locks = textDiff.getLocks(page, equipmentId);
-        //console.log(page);
-        console.log("locks being addedd ...");
-        console.log(locks);
-        let currentText = util.getText(page);
-        console.log(currentText);
+
+        let currentText =  quil.current.getEditor().getText();//util.getText(page);
         let actualText = actualPages[pgIdx].text;
 
         pages[pgIdx].content = page.innerHTML;
 
-       // console.log(currentText);
-       // console.log(currentText.length);
-
         let mat = lcs.findLCS(actualText, currentText);
         let ans = lcs.findCommonText(actualText, currentText, mat);
         
-        let similar = ans[0];
         let diff = ans[1];
-
-        
-        console.log(diff);
-
-        let quilText = quil.current.getEditor().getText();
-        console.log(quilText);
-        
-        
         try{
             if (quil && quil != undefined){
                 
@@ -192,14 +191,22 @@ const Section = () =>{
         catch(exception){
 
         }   
+
+   
+        if(!modifiedPages.includes("page-"+pgIdx.toString())){
+            modifiedPages.push("page-"+pgIdx.toString());
+            setPagesModified();
+        }
+        
         
         setPages(pages);
+
 
     
         
     }
 
-    const unmountEquipment = (equipmentId, activeEquipmentId, setActiveEquipmentId) => {
+    const unmountEquipment = (equipmentId, activeEquipmentId) => {
         console.log("unmounting equipment ...");
         console.log( equipmentId, activeEquipmentId);
 
@@ -208,9 +215,7 @@ const Section = () =>{
             let elements = document.getElementsByTagName("u");
        
             for(let i=0;i< elements.length;i++){
-                console.log(elements[i].getAttribute("equipment"));
                 if(elements[i].getAttribute("equipment") == null){
-                    console.log(elements[i]);
                     elements[i].setAttribute("equipment", equipmentId);
                     elements[i].setAttribute("class", "removeHighlighter");
                 }
@@ -224,7 +229,7 @@ const Section = () =>{
     const mountEquipment = (equipmentId) => {
         console.log("mounting equipment ...", equipmentId);
         let elements = document.getElementsByTagName("u");
-        console.log(elements);
+    
         for(let i=0;i< elements.length;i++){
             if(elements[i].getAttribute("equipment")){
                if(elements[i].getAttribute("equipment") == equipmentId){
@@ -242,6 +247,22 @@ const Section = () =>{
         document.getElementById("equip-id").innerHTML = equipmentName;
     }
 
+    const setPagesModified = () => {
+
+        let modifiedPageElement = document.getElementById("modifiedPages");
+        modifiedPageElement.innerHTML = "";
+
+        for (let i=0;i< modifiedPages.length; i++){
+            let divELement = document.createElement("div");
+            divELement.setAttribute("class", "modifiedItem");
+            let spanElement = document.createElement("span");
+            spanElement.innerHTML = modifiedPages[i];
+
+            divELement.appendChild(spanElement);
+            modifiedPageElement.appendChild(divELement);
+        }
+    }
+
 
     return (
         <div className='container'>
@@ -255,20 +276,22 @@ const Section = () =>{
                             (equipment) => {
                                 console.log(equipment.id);
                                 console.log(activeEquipmentId);
+                                let currentEquipment = localStorage.getItem("activeEquipmentId");
+                                
+                                
                      
-                                unmountEquipment(activeEquipmentId, equipment.id, setActiveEquipmentId);
+                                unmountEquipment(currentEquipment, equipment.id);
                                 mountEquipment(equipment.id);
-
-                                let elements = document.getElementsByClassName("ql-editor");
-                                let values= [];
-                                for(let i=0;i<elements.length; i++){
-                          
-                                    pages[i].content = elements[i].innerHTML;
-                                   
-                                }
-                            
+                                localStorage.setItem("activeEquipmentId", equipment.id);
                                 activeEquipmentId = equipment.id;
+                                
                                 setEquipmentName(equipment.name);
+                                handlePagesModified();
+                                
+
+                                
+                         
+                                
                   
                                 
                         }}/>}
@@ -278,18 +301,10 @@ const Section = () =>{
                     <div className='metadata'>
                         <div className='title'>
 
-                            <span>{activeEquipment}</span><span  id="equip-id">{activeEquipmentId}</span>
+                            <span  id="equip-id"></span>
                             <Button className='save' onClick={() => {handleSave(section)}}>SAVE</Button>
                         </div>
-                        <div className='pagesModified'>
-                            
-                            {
-                                pagesModified.map((item) => 
-                                    <div className='modifiedItem'>
-                                        <span>{item}</span>
-                                    </div>
-                                )
-                            }
+                        <div id="modifiedPages" className='pagesModified'>
                             
                         </div>
                         <div className='textToolBar'>
@@ -302,7 +317,7 @@ const Section = () =>{
                             
                         
                             pages.map((page, i) => {
-                                console.log(page.content);
+              
                                     return (
                                         <div class="content">
                                             <ReactQuill
@@ -312,7 +327,7 @@ const Section = () =>{
                                                 formats={formats}
                                                 value={page.content}
                                                 onChange={(html, delta, source, editor) => {
-                                                    handleEditorChange(value, i, activeEquipment, source)}} 
+                                                    handleEditorChange( i, source)}} 
                                             />
                                         </div>
                                     )

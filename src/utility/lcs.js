@@ -99,10 +99,6 @@ export default class LCS{
             diff.push(k);
           }
         }
-        //return reverseCommonText.split('').reverse().join('');
-        console.log("printing difference in text ...");
-        console.log(diff);
-        //diff.reverse();
         similar.reverse();
 
         let ans = [this.dfs(similar), this.dfs(diff)];
