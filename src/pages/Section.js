@@ -290,14 +290,7 @@ const Section = () =>{
                                 activeEquipmentId = equipment.id;
                                 
                                 setEquipmentName(equipment.name);
-                                handlePagesModified();
-                                
-
-                                
-                         
-                                
-                  
-                                
+                                handlePagesModified();       
                         }}/>}
                     </div>
                 </div>

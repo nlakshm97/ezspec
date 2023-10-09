@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDkRv2Z9SSJQdl9FNjco7mhu754lh3seEk",
+    apiKey: "",
     authDomain: "yuzu-dev-5a591.firebaseapp.com",
     databaseURL: "https://yuzu-dev-5a591-default-rtdb.firebaseio.com/",
     projectId: "yuzu-dev-5a591",
