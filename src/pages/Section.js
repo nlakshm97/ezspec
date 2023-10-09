@@ -1,8 +1,6 @@
 import './styles/Section.css';
 import React,  {  useEffect } from 'react';
 import parse from 'html-react-parser';
-import TextDiff from '../utility/textdiff';
-import Util from '../utility/util';
 import EquipmentsTable from '../components/Equipment';
 import { useState , useRef} from 'react';
 import {db} from '../utility/firebase'; 
@@ -10,8 +8,10 @@ import { child, onValue, ref , set} from "firebase/database";
 import { Button } from '@mui/base';
 import 'react-quill/dist/quill.snow.css';
 import LCS from '../utility/lcs';
+import html2canvas from "html2canvas";
 
 import ReactQuill, { Quill } from 'react-quill';
+import { createRef } from 'react';
 
 const Section = () =>{
 
@@ -60,19 +60,12 @@ const Section = () =>{
       ]
 
     
-    let textDiff = new TextDiff();
-    let util = new Util();
+ 
     let lcs = new LCS();
-    const quil = useRef();
+    const [quilRefs, setQuilRefs] = useState([]);
 
 
     const [pages, setPages] = useState([]);
-    const [actualPages, setActualPages] = useState([]);
-    const [isPageLoaded, setIsPageLoaded] = useState(false);
-
-    
-
-
     const[isDocumentLoaded, setIsDocumentLoaded] = useState(false);
     const[section, setSection] = useState('hardware');
     var [activeEquipmentId, setActiveEquipmentId] = useState(null);
@@ -96,22 +89,19 @@ const Section = () =>{
         const query = ref(db, "document/"+ sectionId);
         onValue(query, (snapshot) => {
             let data= snapshot.val();
-            
-           // let pagesElement = document.getElementById("pages");
-           // pagesElement.innerHTML = "";
             let values= [];
+            let refs =[];
 
-            let i= 0;
             for(const[key, value] of Object.entries(data)){
-              //  let page = util.createPageElement(i, value);
-             //   pagesElement.appendChild(page);
                 values.push(value);
-               // i += 1;
+                refs.push(createRef());
             }
             setIsDocumentLoaded(true);
             setPages(values);
-            setActualPages(values);
+            setQuilRefs(refs);
+     
         });
+        
         
     }
 
@@ -120,17 +110,15 @@ const Section = () =>{
     const handleSave = (sectionId) => {
         console.log("save called");
         console.log(editorValue);
-        /*
+        
         let data = {};
-        let pages = document.getElementsByClassName("content");
+     
         for(let i=0;i < pages.length;i ++){
             let page = pages[i];
-            data[page.id] = {"content":page.innerHTML, "id":page.id};
+            data[page.id] = {"content":page.content, "id":page.id, "text":page.text};
 
         }
         set(ref(db, 'document/' + sectionId), data);
-        */
-
     }
 
 
@@ -153,21 +141,30 @@ const Section = () =>{
         setPagesModified();
     }
 
+    const getScreenshotOfElement = async (element) => {
+        
+        const canvas = await html2canvas(element)
+       console.log(element);
+        const image = canvas.toDataURL("image/png", 1.0);
+       console.log(image);
+    }
     
     
-    
-    const handleEditorChange= ( pgIdx, source) => {
+    const handleEditorChange= ( pgIdx, source, quilRefs) => {
  
     
         if(source == "api"){
             return;
         }
-      
-        
+     
+       
+        let quil = quilRefs[pgIdx];
+        console.log(quilRefs);
         let page = document.getElementsByClassName("ql-editor")[pgIdx];
-
+        console.log(pgIdx);
+       // getScreenshotOfElement(page);
         let currentText =  quil.current.getEditor().getText();//util.getText(page);
-        let actualText = actualPages[pgIdx].text;
+        let actualText = pages[pgIdx].text;
 
         pages[pgIdx].content = page.innerHTML;
 
@@ -175,13 +172,14 @@ const Section = () =>{
         let ans = lcs.findCommonText(actualText, currentText, mat);
         
         let diff = ans[1];
+        
         try{
             if (quil && quil != undefined){
                 
                 for(let i=0;i<diff.length;i++){
                     let start = diff[i][0];
                     let end = diff[i][1];
-                
+                   
                     quil.current.getEditor().formatText(start, end - start, {        
                         'underline': true
                     });
@@ -269,6 +267,12 @@ const Section = () =>{
             <div className='job'>
                 <div className='details'>
                     <div className='section'>
+                        <div className='metaInfo'>
+                            <span className='highlightHeader'>JOB : </span><span>Ez Spec Job</span>
+                        </div>
+                        <div className='metaInfo'>
+                            <span className='highlightHeader'>SECTION : </span><span>Hardware</span>
+                        </div>
 
                     </div>
                     <div className='equipments'>
@@ -317,19 +321,22 @@ const Section = () =>{
                             
                         
                             pages.map((page, i) => {
-              
+                                    console.log(quilRefs);
                                     return (
                                         <div class="content">
+                                            <div className='pageNumber'>{page.id}</div>
                                             <ReactQuill
                                                 theme="snow"
-                                                ref={quil} 
+                                                ref={quilRefs[i]} 
                                                 modules={modules}
                                                 formats={formats}
                                                 value={page.content}
                                                 onChange={(html, delta, source, editor) => {
-                                                    handleEditorChange( i, source)}} 
+                                                    handleEditorChange( i, source, quilRefs)}} 
                                             />
+                                            
                                         </div>
+                                        
                                     )
                             })
                             

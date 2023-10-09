@@ -12,3 +12,26 @@ input{
     cursor: pointer;
     text-decoration: underline;
 }
+
+.addEquipmentButton{
+    color: white ;
+    background-color: #007AFF;
+    border: none;
+    border-radius: 5px;
+    height: 40px;
+    width: 50%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal{
+    display: flex;
+    justify-content:space-between;
+    flex-direction: column;
+    height: 200px;
+
+}
+.modalHeader{
+    border-bottom: 1px solid gray;
+ 
+}

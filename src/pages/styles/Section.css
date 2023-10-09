@@ -30,22 +30,44 @@ body{
 
 
 .details{
-    height: 100%;
+ 
     width: 38%;
     float: left;
     margin: 1%;
 }
 
 .section{
-    height: 30%;
+    height: 15%;
     width: 100%;
     background-color: lightblue;
 }
 
+.metaInfo{
+    height: 50%;
+    background-color: white;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    border: 1px solid lightgray;
+    padding: 10px;
+}
+
+.highlightHeader{
+    padding: 10px;
+    font-weight: bold;
+    color: white;
+    background-color: lightslategray;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-right: 10px;
+   
+}
+
 .equipments{
     background-color: bisque;
-    height: 70%;
+    height: 75%;
     width: 100%;
+    margin-top: 2%;
 
 }
 .editor{
@@ -92,7 +114,7 @@ body{
 
 }
 .document{
-    height: 90%;
+    height: 100%;
     width: 100%;
     background-color: gray;
 
@@ -101,6 +123,7 @@ body{
     align-items: center;
     flex-direction: row;
     flex-wrap: wrap;
+    overflow: auto;
     
 }
 
@@ -119,21 +142,21 @@ body{
 }
 
 .pageNumber{
-    position: absolute;
-    top: -30px;
-    right: 5px;
     background-color: lightcoral;
     color: white;
     padding: 5px;
     font-size: 15px;
     font-weight: bold;
+    float: right;
+    width: 20%;
+    display: flex;
+    justify-content: center;
     
 
 }
 .content{
     
     width: 100%;
-    height: 95%;
     resize: none;
     border: none;
     background-color: white;
